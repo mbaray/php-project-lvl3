@@ -14,7 +14,7 @@ jobs:
         run: make install
 
       - name: Setup
-      - run: make setup
+        run: make setup
 
       - name: Run test
         run: make test
