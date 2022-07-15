@@ -1,9 +1,9 @@
-name: lint-check
+name: test-check
 
 on: push
 
 jobs:
-  lint:
+  test:
 
     runs-on: ubuntu-latest
 
