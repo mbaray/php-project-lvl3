@@ -13,7 +13,7 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('url', function (Blueprint $table) {
+        Schema::create('urls', function (Blueprint $table) {
             $table->id();
             $table->string('name')->unique();
             $table->timestamp('created_at');
