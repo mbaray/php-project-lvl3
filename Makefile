@@ -8,9 +8,7 @@ setup:
 	touch database/database.sqlite
 	php artisan migrate
 	php artisan db:seed
-	npm ci
-	npm run dev
-	make ide-helper
+	npm install
 
 lint:
 	composer exec --verbose phpcs -- --standard=PSR12 app/Http/Controllers/UrlController.php
