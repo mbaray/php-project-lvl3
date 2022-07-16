@@ -1,6 +1,3 @@
-install:
-	composer install
-
 setup:
 	composer install
 	cp -n .env.example .env
