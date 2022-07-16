@@ -53,12 +53,33 @@ class UrlController extends Controller
         return redirect()->route('urls.show', $id);
     }
 
+    public function storeCheck(int $id)
+    {
+        DB::table('url_checks')->insertGetId(
+            [
+                'url_id' => $id,
+                'status_code' => '200',
+                'h1' => 'h1',
+                'title' => 'title',
+                'description' => 'description',
+                'created_at' => Carbon::now()
+            ]
+        );
+
+        return redirect()->route('urls.show', $id);
+    }
+
     public function show(int $id)
     {
         $url = DB::table('urls')
             ->where('id', $id)
             ->first();
 
-        return view('url.show', compact('url'));
+        $checks = DB::table('url_checks')
+            ->where('url_id', $id)
+            ->orderByDesc('id')
+            ->get();
+
+        return view('url.show', compact('url'), compact('checks'));
     }
 }

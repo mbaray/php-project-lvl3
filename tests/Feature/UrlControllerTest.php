@@ -51,4 +51,35 @@ class UrlControllerTest extends TestCase
             'name' => $this->url
         ]);
     }
+
+    public function testStoreCheck()
+    {
+        $faker = \Faker\Factory::create();
+
+        $title = $faker->name;
+        $h1 = $faker->text;
+        $description = $faker->text;
+        $createdAt = Carbon::now();
+
+        $id = DB::table('url_checks')->insertGetId([
+            'url_id' => $this->id,
+            'status_code' => '200',
+            'h1' => $h1,
+            'title' => $title,
+            'description' => $description,
+            'created_at' => $createdAt
+        ]);
+
+        $response = $this->post(route('urls.store.check', $this->id), ['url' => $this->url]);
+        $response->assertRedirect();
+        $this->assertDatabaseHas('url_checks', [
+            'id' => $id,
+            'url_id' => $this->id,
+            'status_code' => '200',
+            'h1' => $h1,
+            'title' => $title,
+            'description' => $description,
+            'created_at' => $createdAt
+        ]);
+    }
 }
