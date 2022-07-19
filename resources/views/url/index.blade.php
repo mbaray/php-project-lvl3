@@ -11,6 +11,7 @@
                 <th>Последняя проверка</th>
                 <th>Код ответа</th>
             </tr>
+
             @foreach($urls as $url)
                 <tr>
                     <td>{{ $url->id }}</td>
