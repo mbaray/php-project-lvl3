@@ -6,12 +6,21 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Http;
+use DiDom\Document;
 
 class UrlController extends Controller
 {
     public function index()
     {
-        $urls = DB::table('urls')->get();
+        $lastChecks = DB::table('url_checks')
+            ->select('url_id', 'status_code', DB::raw('MAX(created_at) as last_created_at'))
+            ->groupBy('url_id', 'status_code');
+
+        $urls = DB::table('urls')
+            ->leftJoinSub($lastChecks, 'lastChecks', function ($join) {
+                $join->on('urls.id', '=', 'lastChecks.url_id');
+            })->get();
 
         return view('url.index', compact('urls'));
     }
@@ -31,40 +40,11 @@ class UrlController extends Controller
         $urlName = $request->input('url.name');
         $urlScheme = parse_url($urlName, PHP_URL_SCHEME);
         $urlHost = parse_url($urlName, PHP_URL_HOST);
-        $url = "{$urlScheme}//{$urlHost}";
+        $url = "{$urlScheme}://{$urlHost}";
 
         $id = DB::table('urls')->where('name', $url)->exists() ?
             DB::table('urls')->where('name', $url)->value('id') :
             DB::table('urls')->insertGetId(['name' => $url, 'created_at' => Carbon::now()]);
-
-//        if (DB::table('urls')->where('name', $url)->exists()) {
-//            $id = DB::table('urls')
-//                ->where('name', $url)
-//                ->value('id');
-//
-//            return redirect()->route('urls.show', $id);
-//        }
-//
-//        $id = DB::table('urls')->insertGetId([
-//            'name' => $url,
-//            'created_at' => Carbon::now()
-//        ]);
-
-        return redirect()->route('urls.show', $id);
-    }
-
-    public function storeCheck(int $id)
-    {
-        DB::table('url_checks')->insertGetId(
-            [
-                'url_id' => $id,
-                'status_code' => '200',
-                'h1' => 'h1',
-                'title' => 'title',
-                'description' => 'description',
-                'created_at' => Carbon::now()
-            ]
-        );
 
         return redirect()->route('urls.show', $id);
     }
@@ -77,9 +57,31 @@ class UrlController extends Controller
 
         $checks = DB::table('url_checks')
             ->where('url_id', $id)
-            ->orderByDesc('id')
+            ->orderByDesc('created_at')
             ->get();
 
         return view('url.show', compact('url'), compact('checks'));
+    }
+
+    public function storeCheck(int $id)
+    {
+        $url = DB::table('urls')->where('id', $id)->first();
+
+        $response = Http::get($url->name);
+
+        $document = new Document($response->body());
+
+        DB::table('url_checks')->insertGetId(
+            [
+                'url_id' => $id,
+                'status_code' => $response->status(),
+                'h1' => optional($document->first('h1'))->text(),
+                'title' => optional($document->first('title'))->text(),
+                'description' => optional($document->first('meta[name="description"]'))->getAttribute('content'),
+                'created_at' => Carbon::now()
+            ]
+        );
+
+        return redirect()->route('urls.show', $id);
     }
 }

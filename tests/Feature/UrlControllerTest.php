@@ -7,6 +7,7 @@ use Illuminate\Foundation\Testing\WithFaker;
 use Tests\TestCase;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Http;
 
 class UrlControllerTest extends TestCase
 {
@@ -16,12 +17,10 @@ class UrlControllerTest extends TestCase
 
         $this->faker = \Faker\Factory::create();
         $this->url = 'https://' . $this->faker->unique()->domainName;
-        $this->id = DB::table('urls')->insertGetId(
-            [
-                'name' => $this->url,
-                'created_at' => Carbon::now()
-            ]
-        );
+        $this->id = DB::table('urls')->insertGetId([
+            'name' => $this->url,
+            'created_at' => Carbon::now()
+        ]);
     }
 
     public function testIndex()
@@ -54,32 +53,23 @@ class UrlControllerTest extends TestCase
 
     public function testStoreCheck()
     {
-        $faker = \Faker\Factory::create();
-
-        $title = $faker->name;
-        $h1 = $faker->text;
-        $description = $faker->text;
-        $createdAt = Carbon::now();
-
-        $id = DB::table('url_checks')->insertGetId([
-            'url_id' => $this->id,
-            'status_code' => '200',
-            'h1' => $h1,
-            'title' => $title,
-            'description' => $description,
-            'created_at' => $createdAt
+        Http::fake([
+            '*' => Http::response(
+                "<h1>Test h1</h1>
+                <title>Test title</title>
+                <meta name=description content='Test description'",
+                200
+            )
         ]);
 
         $response = $this->post(route('urls.store.check', $this->id), ['url' => $this->url]);
         $response->assertRedirect();
         $this->assertDatabaseHas('url_checks', [
-            'id' => $id,
             'url_id' => $this->id,
             'status_code' => '200',
-            'h1' => $h1,
-            'title' => $title,
-            'description' => $description,
-            'created_at' => $createdAt
+            'h1' => 'Test h1',
+            'title' => 'Test title',
+            'description' => 'Test description'
         ]);
     }
 }
