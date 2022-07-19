@@ -28,7 +28,7 @@ class UrlController extends Controller
     public function store(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'url.name' => 'url|between:0,255'
+            'url.name' => 'required|url|between:0,255'
         ]);
 
         if ($validator->fails()) {
