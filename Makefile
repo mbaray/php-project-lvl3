@@ -19,5 +19,8 @@ test:
 test-coverage-text:
 	XDEBUG_MODE=coverage composer exec --verbose phpunit tests -- --coverage-text
 
+test-coverage:
+	XDEBUG_MODE=coverage composer exec --verbose phpunit tests -- --coverage-clover build/logs/clover.xml
+
 deploy:
 	git push heroku main
