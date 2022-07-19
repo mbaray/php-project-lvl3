@@ -37,7 +37,7 @@ class UrlControllerTest extends TestCase
 
     public function testShow()
     {
-        $response = $this->get(route('urls.show', $this->id));
+        $response = $this->get(route('urls.show', ['id' => $this->id]));
         $response->assertOk();
     }
 
