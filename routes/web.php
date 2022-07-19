@@ -24,4 +24,4 @@ Route::post('/urls', [UrlController::class, 'store'])->name('urls.store');
 
 Route::get('/urls/{id}', [UrlController::class, 'show'])->name('urls.show');
 
-Route::post('/urls/{id}/checks', [UrlController::class, 'storeCheck'])->name('url.store.check');
+Route::post('/urls/{id}/checks', [UrlController::class, 'storeCheck'])->name('urls.store.check');
