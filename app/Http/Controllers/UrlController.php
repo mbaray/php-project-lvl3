@@ -34,7 +34,7 @@ class UrlController extends Controller
         if ($validator->fails()) {
             flash('Некорректный URL')->error();
 
-            return redirect()->route('index');
+            return redirect()->route('index')->withErrors($validator);
         }
 
         $urlName = $request->input('url.name');
