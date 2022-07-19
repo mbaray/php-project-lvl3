@@ -18,9 +18,9 @@ return new class extends Migration
             $table->integer('url_id');
             $table->foreign('url_id')->references('id')->on('urls');
             $table->integer('status_code');
-            $table->string('h1');
-            $table->string('title');
-            $table->string('description');
+            $table->string('h1')->nullable();
+            $table->string('title')->nullable();
+            $table->string('description')->nullable();
             $table->timestamp('created_at');
         });
     }
