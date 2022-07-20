@@ -11,12 +11,15 @@ use Illuminate\Support\Facades\Http;
 
 class UrlControllerTest extends TestCase
 {
+    private int $id;
+    private string $url;
+
     protected function setUp(): void
     {
         parent::setUp();
 
-        $this->faker = \Faker\Factory::create();
-        $this->url = 'https://' . $this->faker->unique()->domainName;
+        $faker = \Faker\Factory::create();
+        $this->url = 'https://' . $faker->unique()->domainName;
         $this->id = DB::table('urls')->insertGetId([
             'name' => $this->url,
             'created_at' => Carbon::now()

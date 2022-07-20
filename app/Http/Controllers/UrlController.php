@@ -67,7 +67,7 @@ class UrlController extends Controller
     {
         $url = DB::table('urls')->where('id', $id)->first();
 
-        $response = Http::get($url->name);
+        $response = Http::get(optional($url)->name);
 
         $document = new Document($response->body());
 
