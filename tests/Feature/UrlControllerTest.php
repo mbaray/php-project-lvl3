@@ -28,7 +28,7 @@ class UrlControllerTest extends TestCase
 
     public function testIndex()
     {
-        $response = $this->get(route('index'));
+        $response = $this->get(route('welcome'));
         $response->assertOk();
     }
 
@@ -40,7 +40,7 @@ class UrlControllerTest extends TestCase
 
     public function testShow()
     {
-        $response = $this->get(route('urls.show', ['id' => $this->id]));
+        $response = $this->get(route('urls.show', $this->id));
         $response->assertOk();
     }
 
@@ -65,7 +65,7 @@ class UrlControllerTest extends TestCase
             )
         ]);
 
-        $response = $this->post(route('urls.store.check', $this->id), ['url' => $this->url]);
+        $response = $this->post(route('urls.checks.store', $this->id), ['url' => $this->url]);
         $response->assertRedirect();
         $this->assertDatabaseHas('url_checks', [
             'url_id' => $this->id,

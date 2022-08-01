@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\UrlController;
+use App\Http\Controllers\UrlCheckController;
 
 /*
 |--------------------------------------------------------------------------
@@ -14,14 +15,9 @@ use App\Http\Controllers\UrlController;
 |
 */
 
-Route::get('/', function () {
-    return view('index');
-})->name('index');
+Route::get('/', [UrlController::class, 'create'])->name('welcome');
 
-Route::get('/urls', [UrlController::class, 'index'])->name('urls.index');
-
-Route::post('/urls', [UrlController::class, 'store'])->name('urls.store');
-
-Route::get('/urls/{id}', [UrlController::class, 'show'])->name('urls.show');
-
-Route::post('/urls/{id}/checks', [UrlController::class, 'storeCheck'])->name('urls.store.check');
+Route::resources([
+    'urls' => UrlController::class,
+    'urls.checks' => UrlCheckController::class
+]);

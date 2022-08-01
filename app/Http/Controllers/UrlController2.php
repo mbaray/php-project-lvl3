@@ -2,18 +2,15 @@
 
 namespace App\Http\Controllers;
 
-use Carbon\Carbon;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\DB;
+use Carbon\Carbon;
+use Illuminate\Support\Facades\Http;
+use DiDom\Document;
 
-class UrlController extends Controller
+class UrlController2 extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
     public function index()
     {
         $lastChecks = DB::table('url_checks')
@@ -28,22 +25,6 @@ class UrlController extends Controller
         return view('url.index', compact('urls'));
     }
 
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        return view('index');
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
     public function store(Request $request)
     {
         $validator = Validator::make($request->all(), [
@@ -53,7 +34,7 @@ class UrlController extends Controller
         if ($validator->fails()) {
             flash('Некорректный URL')->error();
 
-            return redirect()->route('welcome')->withErrors($validator);
+            return redirect()->route('index')->withErrors($validator);
         }
 
         $urlName = $request->input('url.name');
@@ -68,13 +49,7 @@ class UrlController extends Controller
         return redirect()->route('urls.show', $id);
     }
 
-    /**
-     * Display the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function show($id)
+    public function show(int $id)
     {
         $url = DB::table('urls')
             ->where('id', $id)
@@ -88,37 +63,25 @@ class UrlController extends Controller
         return view('url.show', compact('url'), compact('checks'));
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function edit($id)
+    public function storeCheck(int $id)
     {
-        //
-    }
+        $url = DB::table('urls')->where('id', $id)->first();
 
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function update(Request $request, $id)
-    {
-        //
-    }
+        $response = Http::get(optional($url)->name);
 
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy($id)
-    {
-        //
+        $document = new Document($response->body());
+
+        DB::table('url_checks')->insertGetId(
+            [
+                'url_id' => $id,
+                'status_code' => $response->status(),
+                'h1' => optional($document->first('h1'))->text(),
+                'title' => optional($document->first('title'))->text(),
+                'description' => optional($document->first('meta[name="description"]'))->getAttribute('content'),
+                'created_at' => Carbon::now()
+            ]
+        );
+
+        return redirect()->route('urls.show', $id);
     }
 }
