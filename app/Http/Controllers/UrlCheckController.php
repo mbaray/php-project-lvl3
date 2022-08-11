@@ -33,27 +33,33 @@ class UrlCheckController extends Controller
     /**
      * Store a newly created resource in storage.
      *
-     * @param  //\Illuminate\Http\Request  $request
-     * @return //\Illuminate\Http\Response
+     * @param  int $id
+     * @return \Illuminate\Http\RedirectResponse
      */
     public function store(int $id)
     {
-        $url = DB::table('urls')->where('id', $id)->first();
+        $url = DB::table('urls')->find($id);
+        if (is_null($url)) {
+            return response('not found', 404);
+        }
 
-        $response = Http::get(optional($url)->name);
+        try {
+            $response = Http::get(optional($url)->name);
+            $document = new Document($response->body());
 
-        $document = new Document($response->body());
-
-        DB::table('url_checks')->insertGetId(
-            [
-                'url_id' => $id,
-                'status_code' => $response->status(),
-                'h1' => optional($document->first('h1'))->text(),
-                'title' => optional($document->first('title'))->text(),
-                'description' => optional($document->first('meta[name="description"]'))->getAttribute('content'),
-                'created_at' => Carbon::now()
-            ]
-        );
+            DB::table('url_checks')->insertGetId(
+                [
+                    'url_id' => $id,
+                    'status_code' => $response->status(),
+                    'h1' => optional($document->first('h1'))->text(),
+                    'title' => optional($document->first('title'))->text(),
+                    'description' => optional($document->first('meta[name="description"]'))->getAttribute('content'),
+                    'created_at' => Carbon::now()
+                ]
+            );
+        } catch (\Exception $e) {
+            flash($e->getMessage())->error();
+        }
 
         return redirect()->route('urls.show', $id);
     }
