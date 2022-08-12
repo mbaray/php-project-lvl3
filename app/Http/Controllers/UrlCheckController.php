@@ -35,7 +35,7 @@ class UrlCheckController extends Controller
     {
         $url = DB::table('urls')->find($id);
         if (is_null($url)) {
-            return response('not found', 404);
+            abort(404);
         }
         try {
             $response = Http::get(optional($url)->name);

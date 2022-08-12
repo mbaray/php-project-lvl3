@@ -43,7 +43,7 @@ class UrlController extends Controller
     {
         $url = DB::table('urls')->find($id);
         if (is_null($url)) {
-            return response('not found', 404);
+            abort(404);
         }
 
         $checks = DB::table('url_checks')
