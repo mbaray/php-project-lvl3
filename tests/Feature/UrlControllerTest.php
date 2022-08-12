@@ -46,8 +46,6 @@ class UrlControllerTest extends TestCase
 
     public function testStore()
     {
-        $response = $this->post(route('urls.store'), ['url' => $this->url]);
-        $response->assertRedirect();
         $this->assertDatabaseHas('urls', [
             'id' => $this->id,
             'name' => $this->url

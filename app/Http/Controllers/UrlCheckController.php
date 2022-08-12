@@ -7,6 +7,7 @@ use DiDom\Document;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Http\RedirectResponse;
 
 class UrlCheckController extends Controller
 {
@@ -30,19 +31,12 @@ class UrlCheckController extends Controller
         //
     }
 
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  int $id
-     * @return \Illuminate\Http\RedirectResponse
-     */
-    public function store(int $id)
+    public function store(int $id): RedirectResponse
     {
         $url = DB::table('urls')->find($id);
         if (is_null($url)) {
             return response('not found', 404);
         }
-
         try {
             $response = Http::get(optional($url)->name);
             $document = new Document($response->body());

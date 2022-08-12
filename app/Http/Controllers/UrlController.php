@@ -6,15 +6,12 @@ use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\Http\Requests\StorePostRequest;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Contracts\View\View;
 
 class UrlController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Contracts\View\View
-     */
-    public function index()
+    public function index(): View
     {
         $urls = DB::table('urls')->paginate(15);
         $urlChecks = DB::table('url_checks')
@@ -26,53 +23,23 @@ class UrlController extends Controller
         return view('url.index', compact('urls'), compact('urlChecks'));
     }
 
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Contracts\View\View
-     */
-    public function create()
+    public function create(): View
     {
         return view('index');
     }
 
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \App\Http\Requests\StorePostRequest $request
-     * @return \Illuminate\Http\RedirectResponse
-     */
-    public function store(StorePostRequest $request)
+    public function store(StorePostRequest $request): RedirectResponse
     {
-//        $validator = Validator::make($request->all(), [
-//            'url.name' => 'required|url|max:255'
-//        ]);
+        $url = $request->all();
 
-//        if ($validator->fails()) {
-//            flash('Некорректный URL')->error();
-//
-//            return redirect()->route('welcome')->withErrors($validator);
-//        }
-
-        $urlName = $request->input('url.name');
-        $urlScheme = parse_url($urlName, PHP_URL_SCHEME);
-        $urlHost = parse_url($urlName, PHP_URL_HOST);
-        $url = "{$urlScheme}://{$urlHost}";
-
-        $id = DB::table('urls')->where('name', $url)->exists() ?
-            DB::table('urls')->where('name', $url)->value('id') :
-            DB::table('urls')->insertGetId(['name' => $url, 'created_at' => Carbon::now()]);
+        $id = DB::table('urls')->where('name', $url["url.name"])->exists() ?
+            DB::table('urls')->where('name', $url["url.name"])->value('id') :
+            DB::table('urls')->insertGetId(['name' => $url["url.name"], 'created_at' => Carbon::now()]);
 
         return redirect()->route('urls.show', $id);
     }
 
-    /**
-     * Display the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Contracts\View\View
-     */
-    public function show($id)
+    public function show(int $id): View
     {
         $url = DB::table('urls')->find($id);
         if (is_null($url)) {
@@ -93,7 +60,7 @@ class UrlController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function edit($id)
+    public function edit(int $id)
     {
         //
     }
@@ -105,7 +72,7 @@ class UrlController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(Request $request, int $id)
     {
         //
     }
@@ -116,7 +83,7 @@ class UrlController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy(int $id)
     {
         //
     }
