@@ -17,7 +17,10 @@ use App\Http\Controllers\UrlCheckController;
 
 Route::get('/', [UrlController::class, 'create'])->name('welcome');
 
-Route::resources([
-    'urls' => UrlController::class,
-    'urls.checks' => UrlCheckController::class
+Route::resource('urls', UrlController::class)->except([
+    'create', 'edit', 'update', 'destroy'
+]);
+
+Route::resource('urls.checks', UrlCheckController::class)->only([
+    'store'
 ]);
