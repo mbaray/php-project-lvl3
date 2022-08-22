@@ -14,17 +14,13 @@ class UrlController extends Controller
     public function index(): View
     {
         $urls = DB::table('urls')->paginate(15);
-
         $urlChecks = DB::table('url_checks')
-            ->select('url_id', 'status_code', 'created_at as last_created_at')
-            ->distinct('url_id')
-            ->orderBy('url_id')
-            ->orderBy('created_at', 'desc')
-            ->whereIn('url_id', $urls->getCollection()->pluck('id'))
+            ->select('url_id', 'status_code', DB::raw('MAX(created_at) as last_created_at'))
+            ->groupBy('url_id', 'status_code')
             ->get()
             ->keyBy('url_id');
 
-        return view('url.index', compact('urls', 'urlChecks'));
+        return view('url.index', compact('urls'), compact('urlChecks'));
     }
 
     public function create(): View
@@ -46,13 +42,49 @@ class UrlController extends Controller
     public function show(int $id): View
     {
         $url = DB::table('urls')->find($id);
-        abort_unless($url, 404);
+        if (is_null($url)) {
+            abort(404);
+        }
 
         $checks = DB::table('url_checks')
             ->where('url_id', $id)
             ->orderByDesc('created_at')
             ->get();
 
-        return view('url.show', compact('url', 'checks'));
+        return view('url.show', compact('url'), compact('checks'));
+    }
+
+    /**
+     * Show the form for editing the specified resource.
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function edit(int $id)
+    {
+        //
+    }
+
+    /**
+     * Update the specified resource in storage.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function update(Request $request, int $id)
+    {
+        //
+    }
+
+    /**
+     * Remove the specified resource from storage.
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function destroy(int $id)
+    {
+        //
     }
 }
