@@ -18,9 +18,9 @@ class UrlController extends Controller
         $urlChecks = DB::table('url_checks')
             ->select('url_id', 'status_code', 'created_at as last_created_at')
             ->distinct('url_id')
+            ->whereIn('url_id', $urls->getCollection()->pluck('id'))
             ->orderBy('url_id')
             ->orderBy('created_at', 'desc')
-            ->whereIn('url_id', $urls->getCollection()->pluck('id'))
             ->get()
             ->keyBy('url_id');
 
