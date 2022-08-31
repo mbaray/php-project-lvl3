@@ -49,7 +49,7 @@ class StorePostRequest extends FormRequest
 
     protected function prepareForValidation(): void
     {
-        $urlName = $this->url['name'];
+        $urlName = $this->url['name'] ?? '';
         $urlScheme = parse_url($urlName, PHP_URL_SCHEME);
         $urlHost = parse_url($urlName, PHP_URL_HOST);
 

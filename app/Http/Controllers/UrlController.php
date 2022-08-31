@@ -13,6 +13,7 @@ class UrlController extends Controller
 {
     public function index(): View
     {
+        /** @var \Illuminate\Pagination\AbstractPaginator $urls */
         $urls = DB::table('urls')->paginate(15);
 
         $urlChecks = DB::table('url_checks')
