@@ -2,7 +2,6 @@
     "private": true,
     "scripts": {
         "dev": "npm run development",
-        "build": "vite build",
         "development": "mix",
         "watch": "mix watch",
         "watch-poll": "mix watch -- --watch-options-poll=1000",
