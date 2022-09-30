@@ -11,7 +11,7 @@ use Illuminate\Contracts\View\View;
 
 class UrlController extends Controller
 {
-    public function index(): View
+    public function index()//: View
     {
         /** @var \Illuminate\Pagination\AbstractPaginator $urls */
         $urls = DB::table('urls')->paginate(15);
@@ -37,9 +37,9 @@ class UrlController extends Controller
     {
         $url = $request->all();
 
-        $id = DB::table('urls')->where('name', $url["url.name"])->exists() ?
-            DB::table('urls')->where('name', $url["url.name"])->value('id') :
-            DB::table('urls')->insertGetId(['name' => $url["url.name"], 'created_at' => Carbon::now()]);
+        $id = DB::table('urls')->where('name', $url['url.name'])->exists() ?
+            DB::table('urls')->where('name', $url['url.name'])->value('id') :
+            DB::table('urls')->insertGetId(['name' => $url['url.name'], 'created_at' => Carbon::now()]);
 
         return redirect()->route('urls.show', $id);
     }
